@@ -1,6 +1,15 @@
 package com.controller;
 
+import java.util.List;
+
+
+
+
+
+
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,58 +18,181 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.dao.PostDao;
-import com.vo.PostVo;
+
+
+
+
+
+
+
+
+
+
+
+
+import com.dao.AreaDao;
+import com.dao.BranchDao;
+import com.dao.CityDao;
+import com.dao.LoanDao;
+import com.dao.StateDao;
+import com.vo.AreaVo;
+import com.vo.BranchVo;
+import com.vo.CityVo;
+import com.vo.LoanVo;
+import com.vo.StateVo;
+
 
 
 
 @Controller
 public class VbabsController {
+	@Autowired LoanDao ld1;
+	@Autowired StateDao sd;
+	@Autowired CityDao cd;
+	@Autowired AreaDao areaDao;
+	@Autowired BranchDao branchDao;
 	
-    @Autowired PostDao pd;
-	
-	@RequestMapping("/managePostType") 
-	public ModelAndView insert()
+	@RequestMapping("/manageLoanType") 
+	public ModelAndView insertLoan()
 	{
-		PostVo p=new PostVo();
-		return new ModelAndView("addPost","pvo",p);
+		 LoanVo l=new LoanVo();
+		return new ModelAndView("addLoan","lvo",l);
 	}
-	@RequestMapping("/savePost")
-	public ModelAndView save(HttpServletRequest request,@ModelAttribute("pvo") PostVo p)
+	@RequestMapping("/saveLoan")
+	public ModelAndView save(HttpServletRequest request,@ModelAttribute("lvo") LoanVo l)
 	{
 		System.out.println("done");
-		this.pd.save(p);
+		this.ld1.save(l);
 		System.out.println("done1");
-		PostVo pnew=new PostVo();
-		return new ModelAndView("addPost","pvo",pnew);
-     }
-	
-	@RequestMapping("/login1")
-	public ModelAndView login()
-	{
-		return new ModelAndView("login","","");
-	}
-	@RequestMapping("/verify")
-	public ModelAndView verify(HttpServletRequest request)
-	{
-	    String s1=request.getParameter("username");
-	    String s2=request.getParameter("password");
-		if(s1.equals("admin")&&s2.equals("admin"))
-		{
-			return new ModelAndView("welcome","Message","Verified Successfully");
-		}
-		else
-		{
-			return new ModelAndView("welcome","Message","UserName or Password is incorrect");
-		}
+		LoanVo lnew=new LoanVo();
+		return new ModelAndView("addLoan","lvo",lnew);
+		
 		
 	}
+	@RequestMapping("/manageState") 
+	public ModelAndView insertState()
+	{
+		 StateVo s=new StateVo();
+		return new ModelAndView("addState","svo",s);
+	}
+	@RequestMapping("/saveState")
+	public ModelAndView saveState(HttpServletRequest request,@ModelAttribute("svo") StateVo s)
+	{
+		
+		this.sd.save(s);
+		System.out.println("done1");
+		StateVo snew=new StateVo();
+		return new ModelAndView("addState","svo",snew);
+		
+		
+	}
+	@RequestMapping(value="/manageCity",method=RequestMethod.GET)
+	public ModelAndView insertCity(HttpServletRequest request)
+	{
+		
+		HttpSession ss=request.getSession();
+		List l=this.sd.select();
+		ss.setAttribute("stateList", l);
+		
+	
+		return new ModelAndView("addCity","cvo",new CityVo());
+		
+		
+	}
+
+@RequestMapping(value="/saveCity",method=RequestMethod.POST)
+public ModelAndView saveCity(@ModelAttribute("cvo") CityVo cv)
+{
+	System.out.println("imnnnnn");
+	this.cd.save(cv);
+	System.out.println("done2");
+	
+	CityVo cnew=new CityVo();
+	return new ModelAndView("addCity","","");
 	
 	
+}
+	/*@RequestMapping(value="save1.htm",method=RequestMethod.POST)
+	public ModelAndView save(HttpServletRequest request,@ModelAttribute("rvo") reg_vo r)
+	{
+		System.out.println("done");
+		this.s.save1(r);
+		System.out.println("done1");
+		return new ModelAndView("reg2","message","Data Entered Successfully");
+		
+		
+	}
+	*/
+@RequestMapping(value="/manageArea",method=RequestMethod.GET)
+public ModelAndView insertArea(HttpServletRequest request)
+{
+	
+	HttpSession ss=request.getSession();
+	List l=this.sd.select();
+	ss.setAttribute("stateList", l);
 	
 
+	return new ModelAndView("addArea","areaVo",new AreaVo());
 	
 	
+}
+@RequestMapping("/manageStateToCity")
+public ModelAndView manageStateToCity(HttpServletRequest request)
+{
+	
+	int stateId=Integer.parseInt(request.getParameter("stateId"));
+	
+	List l=this.cd.search(stateId);
+	HttpSession s=request.getSession();
+	s.setAttribute("citylist", l);
+	return new ModelAndView("cityJson","","");
+	
+}
+@RequestMapping("/saveArea")
+public ModelAndView saveArea(HttpServletRequest request,@ModelAttribute("areaVo") AreaVo areaVo)
+{
+	
+	this.areaDao.save(areaVo);
+	System.out.println("done1");
+	AreaVo anew=new AreaVo();
+	return new ModelAndView("addArea","areaVo",anew);
+	
+	
+}
+@RequestMapping(value="/manageBranch",method=RequestMethod.GET)
+public ModelAndView insertBranch(HttpServletRequest request)
+{
+	
+	HttpSession ss=request.getSession();
+	List l=this.sd.select();
+	ss.setAttribute("stateList", l);
+	
 
-
+	return new ModelAndView("addBranch","branchVo",new BranchVo());
+	
+	
+}
+@RequestMapping("/manageCityToArea")
+public ModelAndView manageCityToArea(HttpServletRequest request)
+{
+	
+	int cityId=Integer.parseInt(request.getParameter("cityId"));
+	
+	List l=this.areaDao.search(cityId);
+	HttpSession s=request.getSession();
+	s.setAttribute("arealist", l);
+	return new ModelAndView("areaJson","","");
+	
+}
+@RequestMapping("/saveBranch")
+public ModelAndView saveBranch(HttpServletRequest request,@ModelAttribute("branchVo") BranchVo branchVo)
+{
+	
+	this.branchDao.save(branchVo);
+	System.out.println("done1");
+	BranchVo bnew=new BranchVo();
+	return new ModelAndView("addBranch","branchVo",bnew);
+	
+	
+}
 }
