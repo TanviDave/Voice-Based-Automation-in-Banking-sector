@@ -195,4 +195,28 @@ public ModelAndView saveBranch(HttpServletRequest request,@ModelAttribute("branc
 	
 	
 }
+	@RequestMapping(value="/manageLoanRate",method=RequestMethod.GET)
+public ModelAndView insertLoanRate(HttpServletRequest request)
+{
+	
+	HttpSession ss=request.getSession();
+	List l=this.ld1.select();
+	ss.setAttribute("loanList", l);
+	
+
+	return new ModelAndView("addLoanRate","loanRateVo",new LoanRateVo());
+	
+	
+}
+@RequestMapping("/saveLoanRate")
+public ModelAndView saveLoanRate(HttpServletRequest request,@ModelAttribute("loanRateVo") LoanRateVo loanRateVo)
+{
+	System.out.println("done");
+	this.loanRateDao.save(loanRateVo);
+	System.out.println("done1");
+	LoanRateVo lrnew=new LoanRateVo();
+	return new ModelAndView("addLoanRate","loanRateVo",lrnew);
+	
+	
+}
 }
